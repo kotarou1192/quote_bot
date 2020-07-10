@@ -1,6 +1,6 @@
 import * as discord from "discord.js";
 
-let url;
+let url: string;
 let ServerId;
 let ChannelId: any;
 let MessageId: string;
@@ -16,8 +16,6 @@ export async function quote(client: discord.Client) {
       return;
 
     if (!isDiscordChatURL(msg)) return;
-
-    const url = msg.content;
 
     const channel = msg.guild.channels.resolve(
       ChannelId
@@ -39,12 +37,14 @@ export async function quote(client: discord.Client) {
 }
 
 function isDiscordChatURL(msg: discord.Message) {
-  const pattern = /https:\/\/discordapp.com\/channels\//;
+  const pattern = /https:\/\/discordapp.com\/channels\/\d+\/\d+\/\d+/;
   const result = msg.content.match(pattern);
 
   if (result === null) return false;
 
-  const url = msg.content;
+  url = result.toString();
+
+  console.log(url);
 
   try {
     [ServerId, ChannelId, MessageId] = parseUrl(url);
