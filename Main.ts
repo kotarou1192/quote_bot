@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import { promisify } from "util";
-import { BotCore } from "./BotCore";
+import { BotCore } from "./bot-core";
 
 promisify(fs.readFile)(".env", "utf-8")
   .then((data) => {
