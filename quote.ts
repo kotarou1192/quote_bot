@@ -4,8 +4,7 @@ let url: string;
 let ChannelId: string;
 let MessageId: string;
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export async function quote(client: discord.Client) {
+export async function quote(client: discord.Client): Promise<void> {
   client.on("message", async (msg) => {
     if (
       msg.guild === null ||
@@ -26,7 +25,7 @@ export async function quote(client: discord.Client) {
         const author = msg.client.users.cache.get(targetMessage.author.id);
         if (author === undefined) throw new TypeError("author is empty");
 
-        createEmbed(msg, targetMessage, url, author);
+        generateQupteMessage(msg, targetMessage, url, author);
       })
       .catch((error) => {
         console.error(error);
@@ -35,7 +34,7 @@ export async function quote(client: discord.Client) {
   });
 }
 
-function isDiscordChatURL(msg: discord.Message) {
+function isDiscordChatURL(msg: discord.Message): boolean {
   const pattern = /https:\/\/discordapp.com\/channels\/\d+\/\d+\/\d+/;
   const result = msg.content.match(pattern);
 
@@ -53,12 +52,12 @@ function isDiscordChatURL(msg: discord.Message) {
   return true;
 }
 
-function createEmbed(
+function generateQupteMessage(
   msg: discord.Message,
   message: discord.Message,
   url: string,
   author: discord.User
-) {
+): void {
   if (message.embeds[0] instanceof discord.MessageEmbed) {
     for (let index = 0; index < message.embeds.length; index++) {
       message.embeds[index].setURL(url).setTimestamp();
@@ -70,7 +69,8 @@ function createEmbed(
     message.attachments.values().next().value instanceof
     discord.MessageAttachment
   ) {
-    return msg.channel.send(message.attachments.values().next().value);
+    msg.channel.send(message.attachments.values().next().value);
+    return;
   }
   const embed = new discord.MessageEmbed()
     .setURL(url)
@@ -82,7 +82,7 @@ function createEmbed(
   msg.channel.send(embed);
 }
 
-function parseUrl(url: string) {
+function parseUrl(url: string): string[] {
   const values = url.match(/\/\d+/g);
   if (values === null) throw new ArgumentError("url type is invalid");
   if (values.length !== 3) throw new ArgumentError("url type is invalid");
