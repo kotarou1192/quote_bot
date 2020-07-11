@@ -13,7 +13,7 @@ export async function quote(client: discord.Client): Promise<void> {
     )
       return;
 
-    if (!isDiscordChatURL(msg)) return;
+    if (!hasDiscordChatURL(msg)) return;
 
     const channel = msg.guild.channels.resolve(
       ChannelId
@@ -34,7 +34,7 @@ export async function quote(client: discord.Client): Promise<void> {
   });
 }
 
-function isDiscordChatURL(msg: discord.Message): boolean {
+function hasDiscordChatURL(msg: discord.Message): boolean {
   const pattern = /https:\/\/discordapp.com\/channels\/\d+\/\d+\/\d+/;
   const result = msg.content.match(pattern);
 
