@@ -25,7 +25,7 @@ export async function quote(client: discord.Client): Promise<void> {
         const author = msg.client.users.cache.get(targetMessage.author.id);
         if (author === undefined) throw new TypeError("author is empty");
 
-        generateQupteMessage(msg, targetMessage, url, author);
+        generateQupteMessage(msg, targetMessage, author);
       })
       .catch((error) => {
         console.error(error);
@@ -53,30 +53,48 @@ function hasDiscordChatURL(msg: discord.Message): boolean {
 function generateQupteMessage(
   msg: discord.Message,
   message: discord.Message,
-  url: string,
   author: discord.User
 ): void {
   if (typeof message.content === "string" && message.content !== "") {
     const embed = new discord.MessageEmbed()
-      .setURL(url)
       .setAuthor(author.username, author.displayAvatarURL())
       .setDescription(message.content)
-      .setColor("RANDOM")
-      .setTimestamp();
+      .setColor("RANDOM");
+    if (
+      message.attachments.values().next().value instanceof
+      discord.MessageAttachment
+    ) {
+      message.attachments.forEach((attachment) => {
+        embed.setImage(attachment.url);
+      });
+    }
 
+    // embedがついていたら全て追加で送信
     msg.channel.send(embed);
+    if (message.embeds[0] instanceof discord.MessageEmbed) {
+      for (let index = 0; index < message.embeds.length; index++) {
+        msg.channel.send(message.embeds[index]);
+      }
+    }
+    return;
+  }
+
+  if (
+    message.attachments.values().next().value instanceof
+    discord.MessageAttachment
+  ) {
+    message.attachments.forEach((attachment) => {
+      const embed = new discord.MessageEmbed()
+        .setAuthor(author.username, author.displayAvatarURL())
+        .setImage(attachment.url);
+      msg.channel.send(embed);
+    });
   }
   if (message.embeds[0] instanceof discord.MessageEmbed) {
     for (let index = 0; index < message.embeds.length; index++) {
       message.embeds[index].setURL(url).setTimestamp();
       msg.channel.send(message.embeds[index]);
     }
-  }
-  if (
-    message.attachments.values().next().value instanceof
-    discord.MessageAttachment
-  ) {
-    msg.channel.send(message.attachments.values().next().value);
   }
 }
 
