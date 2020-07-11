@@ -42,8 +42,6 @@ function hasDiscordChatURL(msg: discord.Message): boolean {
 
   url = result.toString();
 
-  console.log(url);
-
   try {
     [, ChannelId, MessageId] = parseUrl(url);
   } catch (error) {
@@ -58,28 +56,28 @@ function generateQupteMessage(
   url: string,
   author: discord.User
 ): void {
+  if (typeof message.content === "string" && message.content !== "") {
+    const embed = new discord.MessageEmbed()
+      .setURL(url)
+      .setAuthor(author.username, author.displayAvatarURL())
+      .setDescription(message.content)
+      .setColor("RANDOM")
+      .setTimestamp();
+
+    msg.channel.send(embed);
+  }
   if (message.embeds[0] instanceof discord.MessageEmbed) {
     for (let index = 0; index < message.embeds.length; index++) {
       message.embeds[index].setURL(url).setTimestamp();
       msg.channel.send(message.embeds[index]);
     }
-    return;
   }
   if (
     message.attachments.values().next().value instanceof
     discord.MessageAttachment
   ) {
     msg.channel.send(message.attachments.values().next().value);
-    return;
   }
-  const embed = new discord.MessageEmbed()
-    .setURL(url)
-    .setAuthor(author.username, author.displayAvatarURL())
-    .setDescription(message.content)
-    .setColor("RANDOM")
-    .setTimestamp();
-
-  msg.channel.send(embed);
 }
 
 function parseUrl(url: string): string[] {
