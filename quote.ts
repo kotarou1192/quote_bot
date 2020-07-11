@@ -1,8 +1,7 @@
 import * as discord from "discord.js";
 
 let url: string;
-let ServerId;
-let ChannelId: any;
+let ChannelId: string;
 let MessageId: string;
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -47,14 +46,19 @@ function isDiscordChatURL(msg: discord.Message) {
   console.log(url);
 
   try {
-    [ServerId, ChannelId, MessageId] = parseUrl(url);
+    [, ChannelId, MessageId] = parseUrl(url);
   } catch (error) {
     return false;
   }
   return true;
 }
 
-function createEmbed(msg: discord.Message, message: any, url: string, author: discord.User) {
+function createEmbed(
+  msg: discord.Message,
+  message: discord.Message,
+  url: string,
+  author: discord.User
+) {
   if (message.embeds[0] instanceof discord.MessageEmbed) {
     for (let index = 0; index < message.embeds.length; index++) {
       message.embeds[index].setURL(url).setTimestamp();
@@ -92,7 +96,7 @@ function parseUrl(url: string) {
 
 class ArgumentError extends Error {
   date: Date;
-  constructor(message: string = "", ...params: any) {
+  constructor(message = "", ...params: (string | undefined)[]) {
     super(...params);
 
     if (Error.captureStackTrace) {
