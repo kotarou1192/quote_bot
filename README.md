@@ -1,6 +1,8 @@
 # quote_bot
 
-first: `tsc main.ts`
+first: `npm install discord.js`
+
+next: `tsc main.ts`
 
 next: make `.env` file to the project root directory.
 
@@ -20,8 +22,6 @@ your-bot-directory-name/
   bot-core.js
   quote.js
 ```
-
-next: `npm install discord.js`
 
 finally: `node main.js`
 
