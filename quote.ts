@@ -34,7 +34,7 @@ export async function quote(client: discord.Client): Promise<void> {
 }
 
 function getDiscordChatURLElements(msg: discord.Message): string[] {
-  const pattern = /https:\/\/discordapp.com\/channels\/\d+\/\d+\/\d+/;
+  const pattern = /https:\/\/discord.*\.com\/channels\/\d+\/\d+\/\d+/;
   const result = msg.content.match(pattern);
 
   if (result === null) return [];
@@ -54,7 +54,7 @@ function getDiscordChatURLElements(msg: discord.Message): string[] {
 }
 
 function hasDiscordChatURL(msg: discord.Message): boolean {
-  const pattern = /https:\/\/discordapp.com\/channels\/\d+\/\d+\/\d+/;
+  const pattern = /https:\/\/discord.*\.com\/channels\/\d+\/\d+\/\d+/;
   const result = msg.content.match(pattern);
 
   if (result === null) return false;
