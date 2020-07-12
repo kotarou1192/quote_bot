@@ -1,9 +1,5 @@
 import * as discord from "discord.js";
 
-let url: string;
-let ChannelId: string;
-let MessageId: string;
-
 export async function quote(client: discord.Client): Promise<void> {
   client.on("message", async (msg) => {
     if (
@@ -15,12 +11,14 @@ export async function quote(client: discord.Client): Promise<void> {
 
     if (!hasDiscordChatURL(msg)) return;
 
+    const [, channelId, messageId] = getDiscordChatURLElements(msg);
+
     const channel = msg.guild.channels.resolve(
-      ChannelId
+      channelId
     ) as discord.TextChannel;
 
     channel.messages
-      .fetch(MessageId)
+      .fetch(messageId)
       .then((targetMessage: discord.Message) => {
         const author = msg.client.users.cache.get(targetMessage.author.id);
         if (author === undefined) throw new TypeError("author is empty");
@@ -28,10 +26,31 @@ export async function quote(client: discord.Client): Promise<void> {
         generateQupteMessage(msg, targetMessage, author);
       })
       .catch((error) => {
+        console.log(new Date());
         console.error(error);
         return;
       });
   });
+}
+
+function getDiscordChatURLElements(msg: discord.Message): string[] {
+  const pattern = /https:\/\/discordapp.com\/channels\/\d+\/\d+\/\d+/;
+  const result = msg.content.match(pattern);
+
+  if (result === null) return [];
+
+  const url = result.toString();
+
+  let guildId: string;
+  let channelId: string;
+  let messageId: string;
+
+  try {
+    [guildId, channelId, messageId] = parseUrl(url);
+  } catch (error) {
+    return [];
+  }
+  return [guildId, channelId, messageId];
 }
 
 function hasDiscordChatURL(msg: discord.Message): boolean {
@@ -40,10 +59,10 @@ function hasDiscordChatURL(msg: discord.Message): boolean {
 
   if (result === null) return false;
 
-  url = result.toString();
+  const url = result.toString();
 
   try {
-    [, ChannelId, MessageId] = parseUrl(url);
+    parseUrl(url);
   } catch (error) {
     return false;
   }
@@ -92,7 +111,6 @@ function generateQupteMessage(
   }
   if (message.embeds[0] instanceof discord.MessageEmbed) {
     for (let index = 0; index < message.embeds.length; index++) {
-      message.embeds[index].setURL(url).setTimestamp();
       msg.channel.send(message.embeds[index]);
     }
   }

@@ -15,5 +15,6 @@ promisify(fs.readFile)(".env", "utf-8")
     bot.run();
   })
   .catch((error) => {
+    console.log(new Date());
     console.error(error);
   });
