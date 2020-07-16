@@ -1,10 +1,13 @@
 # quote_bot
+first: `git clone git@github.com:kotarou1192/quote_bot.git`
 
-first: `npm install discord.js`
+next: open the quote_bot folder on the console.
 
-next: `tsc main.ts`
+next: `npm install`
 
-next: make `.env` file to the project root directory.
+next: `tsc src/main.ts`
+
+next: create `.env` to the `src/`
 
 next: edit .env like this
   ```json
@@ -17,10 +20,20 @@ in directory may be:
 
 ```
 your-bot-directory-name/
-  .env
-  main.js
-  bot-core.js
-  quote.js
+  .git
+  .gitignore
+  node_modules
+  package.json
+  package-lock.json
+  README.md
+  src/
+    .env
+    main.js
+    main.ts
+    bot-core.js
+    bot-core.ts
+    quote.js
+    quote.ts
 ```
 
 finally: `node main.js`
