@@ -36,6 +36,8 @@ your-bot-directory-name/
     quote.ts
 ```
 
+next: `cd src`
+
 finally: `node main.js`
 
 
