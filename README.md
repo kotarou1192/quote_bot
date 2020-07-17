@@ -45,7 +45,7 @@ finally: `node main.js`
 
 first: copy the message url to clipboard.(right click a message and copy the message link)
 
-finally: send message url.
+finally: paste the url and send it.
 
 bot quotes like this:
 
