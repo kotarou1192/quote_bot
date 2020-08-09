@@ -11,46 +11,55 @@ export async function quote(client: discord.Client): Promise<void> {
 
     if (!hasDiscordChatURL(msg)) return;
 
-    const [, channelId, messageId] = getDiscordChatURLElements(msg);
-
-    const channel = msg.guild.channels.resolve(
-      channelId
-    ) as discord.TextChannel;
-
-    channel.messages
-      .fetch(messageId)
-      .then((targetMessage: discord.Message) => {
-        const author = msg.client.users.cache.get(targetMessage.author.id);
-        if (author === undefined) throw new TypeError("author is empty");
-
-        generateQupteMessage(msg, targetMessage, author);
-      })
-      .catch((error) => {
-        console.log(new Date());
-        console.error(error);
+    getDiscordChatURLElements(msg).forEach((result) => {
+      if (
+        msg.guild === null ||
+        client.user === null ||
+        msg.author.id === client.user.id
+      )
         return;
-      });
+      const [, channelId, messageId] = result;
+
+      const channel = msg.guild.channels.resolve(
+        channelId
+      ) as discord.TextChannel;
+
+      channel.messages
+        .fetch(messageId)
+        .then((targetMessage: discord.Message) => {
+          const author = msg.client.users.cache.get(targetMessage.author.id);
+          if (author === undefined) throw new TypeError("author is empty");
+
+          generateQupteMessage(msg, targetMessage, author);
+        })
+        .catch((error) => {
+          console.log(new Date());
+          console.error(error);
+          return;
+        });
+    });
   });
 }
 
-function getDiscordChatURLElements(msg: discord.Message): string[] {
-  const pattern = /https:\/\/discord.*\.com\/channels\/\d+\/\d+\/\d+/;
-  const result = msg.content.match(pattern);
+function getDiscordChatURLElements(msg: discord.Message): string[][] {
+  const pattern = /https:\/\/discord.*\.com\/channels\/\d+\/\d+\/\d+/g;
+  const results = msg.content.match(pattern);
 
-  if (result === null) return [];
+  if (results === null) return [];
 
-  const url = result.toString();
-
-  let guildId: string;
-  let channelId: string;
-  let messageId: string;
-
-  try {
-    [guildId, channelId, messageId] = parseUrl(url);
-  } catch (error) {
-    return [];
-  }
-  return [guildId, channelId, messageId];
+  const resultArray = results.map((result) => {
+    const url = result.toString();
+    let guildId: string;
+    let channelId: string;
+    let messageId: string;
+    try {
+      [guildId, channelId, messageId] = parseUrl(url);
+    } catch (error) {
+      return [];
+    }
+    return [guildId, channelId, messageId];
+  });
+  return resultArray;
 }
 
 function hasDiscordChatURL(msg: discord.Message): boolean {
