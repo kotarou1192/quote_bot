@@ -2,6 +2,8 @@
 ## how to install
 first: `git clone git@github.com:kotarou1192/quote_bot.git`
 
+[invite me!](https://discord.com/api/oauth2/authorize?client_id=702490085593055252&permissions=3072&scope=bot)
+
 next: open the quote_bot folder on the console.
 
 next: `npm install`
