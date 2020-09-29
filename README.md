@@ -14,7 +14,7 @@ next: create `.env` to the `src/`
 next: edit .env like this
   ```json
   {
-    token: 'input_your_bot_token_here'
+    "token": "input_your_bot_token_here"
   }
   ```
 
