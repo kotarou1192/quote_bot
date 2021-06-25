@@ -1,0 +1,78 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine. 
+# See: https://circleci.com/docs/2.0/configuration-reference
+version: 2.1
+
+orbs:
+  # The Node.js orb contains a set of prepackaged CircleCI configuration you can utilize
+  # Orbs reduce the amount of configuration required for common tasks. 
+  # See the orb documentation here: https://circleci.com/developer/orbs/orb/circleci/node
+  node: circleci/node@4.1
+
+workflows:
+  # Below is the definition of your workflow.
+  # Inside the workflow, you provide the jobs you want to run, e.g this workflow runs the build-and-test job above.
+  # CircleCI will run this workflow on every commit.
+  # For more details on extending your workflow, see the configuration docs: https://circleci.com/docs/2.0/configuration-reference/#workflows
+  push: 
+    jobs:
+      - install_modules
+      - deploy:
+          requires:
+            - install_modules
+          filters:
+            branches:
+              only: master
+jobs:
+  # Below is the definition of your job to build and test your app, you can rename and customize it as you want.
+  install_modules:  
+    # These next lines define a Docker executor: https://circleci.com/docs/2.0/executor-types/
+    # You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
+    # A list of available CircleCI Docker Convenience Images are available here: https://circleci.com/developer/images/image/cimg/node
+    docker:
+      - image: cimg/node:15.1
+    # Then run your tests!
+    # CircleCI will report the results back to your VCS provider.
+    
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - yarn-cache-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+      - run:
+          name: install dependencies
+          command: yarn install
+      - save_cache:
+          key: yarn-cache-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules
+  deploy:
+      docker:
+        # check https://circleci.com/docs/ja/2.0/circleci-images/#postgresql
+        - image: cimg/node:15.1
+        
+      steps:
+        - checkout
+        - restore_cache:
+            keys:
+              - yarn-cache-{{ arch }}-{{ .Branch }}-{{ checksum "yarn.lock" }}
+        - run: 
+            name: transpile
+            command: yarn exec tsc
+        - add_ssh_keys:
+            fingerprints:
+              - host_fingerprint
+        - run:
+            name: add fingerprints
+            command: ssh-keyscan ${hostname} >> ~/.ssh/known_hosts
+        - run:
+            name: Send Via SCP
+            command: scp -r dist/* ${username}@${hostname}:~/discord_bots/${botname}/
+        - run:
+            name: Send package.json
+            command: scp package.json ${username}@${hostname}:~/discord_bots/${botname}/
+        - run:
+            name: Install node_modules
+            command: ssh ${username}@${hostname} "cd discord_bots/${botname}/;yarn install"
+        - run:
+            name: Restart App
+            command: ssh ${username}@${hostname} "cd discord_bots/${botname}/;yarn server:stop;yarn server:start"
