@@ -1,4 +1,5 @@
 # quote_bot
+[invite link](https://discord.com/api/oauth2/authorize?client_id=702490085593055252&permissions=3072&scope=bot)
 ## how to install
 first: `git clone git@github.com:kotarou1192/quote_bot.git`
 
@@ -13,7 +14,7 @@ next: create `.env` to the `src/`
 next: edit .env like this
   ```json
   {
-    token: 'input_your_bot_token_here'
+    "token": "input_your_bot_token_here"
   }
   ```
 
